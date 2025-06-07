@@ -4,6 +4,7 @@ const LANES = [-3, 0, 3];
 const PLAYER_SPEED = 15;
 const OBSTACLE_COUNT = 10;
 const COIN_COUNT = 30;
+const CAR_COUNT = 5;
 
 export default class Game {
     constructor(scene, camera, audio) {
@@ -56,7 +57,6 @@ export default class Game {
             }
         });
 
-
         // Obstacles Pool
         this.obstacles = [];
         const obstacleGeo = new THREE.BoxGeometry(2, 2, 2);
@@ -80,6 +80,62 @@ export default class Game {
             this.coins.push(coin);
             this.scene.add(coin);
         }
+
+        // Cars Pool
+        this.cars = [];
+        for (let i = 0; i < CAR_COUNT; i++) {
+            const car = this.createCar();
+            car.visible = false;
+            this.cars.push(car);
+            this.scene.add(car);
+        }
+    }
+
+    createCar() {
+        const car = new THREE.Group();
+
+        // Car Body
+        const bodyGeo = new THREE.BoxGeometry(2, 1, 4);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0xaa0000, roughness: 0.5, metalness: 0.5 });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.position.y = 0.5;
+        car.add(body);
+
+        // Car Cabin
+        const cabinGeo = new THREE.BoxGeometry(1.5, 0.8, 2);
+        const cabinMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.1, metalness: 0.2 });
+        const cabin = new THREE.Mesh(cabinGeo, cabinMat);
+        cabin.position.set(0, 1.2, -0.5);
+        car.add(cabin);
+
+        // Headlights
+        const lightGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 16);
+        const lightMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        
+        const headLight1 = new THREE.Mesh(lightGeo, lightMat);
+        headLight1.position.set(-0.7, 0.5, -2.05);
+        headLight1.rotation.x = Math.PI / 2;
+        car.add(headLight1);
+        
+        const headLight2 = headLight1.clone();
+        headLight2.position.x = 0.7;
+        car.add(headLight2);
+
+        // Taillights
+        const tailLightMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const tailLight1 = new THREE.Mesh(lightGeo, tailLightMat);
+        tailLight1.position.set(-0.7, 0.5, 2.05);
+        tailLight1.rotation.x = Math.PI / 2;
+        car.add(tailLight1);
+
+        const tailLight2 = tailLight1.clone();
+        tailLight2.position.x = 0.7;
+        car.add(tailLight2);
+        
+        // Add a speed property to the car group
+        car.userData.speed = 0;
+
+        return car;
     }
 
     setupControls() {
@@ -122,8 +178,7 @@ export default class Game {
         this.paused = false;
         this.score = 0;
         this.speed = PLAYER_SPEED;
-        this.updateScoreUI();
-        
+
         this.player.position.set(0, 1.5, 0);
         this.player.currentLane = 1;
         this.scene.add(this.player);
@@ -133,8 +188,8 @@ export default class Game {
         
         this.obstacles.forEach(o => o.visible = false);
         this.coins.forEach(c => c.visible = false);
+        this.cars.forEach(car => car.visible = false);
         this.spawnInitialObjects();
-        document.getElementById('game-over-screen').classList.remove('active');
     }
 
     update(deltaTime) {
@@ -150,12 +205,26 @@ export default class Game {
         this.camera.position.z = this.player.position.z + 10;
         
         this.updateWorld();
+        this.updateCars(deltaTime);
         this.checkCollisions();
         
         // Animate coins
         this.coins.forEach(coin => {
             if(coin.visible) {
                 coin.rotation.z += deltaTime * 2;
+            }
+        });
+    }
+
+    updateCars(deltaTime) {
+        this.cars.forEach(car => {
+            if (car.visible) {
+                car.position.z += car.userData.speed * deltaTime;
+                
+                // De-spawn car if it's far behind the player
+                if(car.position.z > this.player.position.z + 20) {
+                    car.visible = false;
+                }
             }
         });
     }
@@ -174,23 +243,41 @@ export default class Game {
     spawnObjectsOnGround(ground) {
         const startZ = ground.position.z - 25;
         const endZ = ground.position.z + 25;
+        const occupiedLanes = {}; // To prevent spawning multiple things in the same spot
 
-        for (let z = startZ; z < endZ; z += 10) {
+        for (let z = startZ; z < endZ; z += 15) { // Increased spacing
             const lane = Math.floor(Math.random() * 3);
-            if (Math.random() < 0.3) {
+            if (occupiedLanes[z] === lane) continue;
+
+            const randomVal = Math.random();
+
+            if (randomVal < 0.2) { // Spawn static obstacle
                 const obstacle = this.getInactive(this.obstacles);
                 if (obstacle) {
                     obstacle.position.set(LANES[lane], 1, z);
                     obstacle.visible = true;
+                    occupiedLanes[z] = lane;
                 }
-            } else if (Math.random() < 0.7) {
-                for(let i = 0; i < 3; i++){
+            } else if (randomVal < 0.4) { // Spawn a moving car
+                const car = this.getInactive(this.cars);
+                if (car) {
+                    car.position.set(LANES[lane], 0, z);
+                    // Cars can move with or against player direction
+                    car.userData.speed = (Math.random() > 0.5) ? PLAYER_SPEED * 0.5 : -PLAYER_SPEED * 0.2;
+                    // Flip car model if it's moving towards player
+                    car.rotation.y = car.userData.speed > 0 ? Math.PI : 0;
+                    car.visible = true;
+                    occupiedLanes[z] = lane;
+                }
+            } else if (randomVal < 0.8) { // Spawn coins
+                for(let i = 0; i < 5; i++){
                     const coin = this.getInactive(this.coins);
                     if (coin) {
                         coin.position.set(LANES[lane], 1.5, z + i * 1.5);
                         coin.visible = true;
                     }
                 }
+                occupiedLanes[z] = lane;
             }
         }
     }
@@ -219,13 +306,21 @@ export default class Game {
             }
         });
 
+        this.cars.forEach(car => {
+            if (car.visible) {
+                const carBox = new THREE.Box3().setFromObject(car);
+                if (playerBox.intersectsBox(carBox)) {
+                    this.gameOver();
+                }
+            }
+        });
+
         this.coins.forEach(coin => {
             if (coin.visible) {
                 const coinBox = new THREE.Box3().setFromObject(coin);
                 if (playerBox.intersectsBox(coinBox)) {
                     coin.visible = false;
                     this.score++;
-                    this.updateScoreUI();
                     this.audio.playSound('collect');
                 }
             }
@@ -238,14 +333,10 @@ export default class Game {
     
     pause() {
         this.paused = true;
-        this.audio.pauseSound('music');
     }
     
     resume() {
         this.paused = false;
-        if(this.isPlaying && !this.isGameOver) {
-             this.audio.playSound('music');
-        }
     }
 
     gameOver() {
@@ -256,9 +347,5 @@ export default class Game {
         this.audio.playSound('crash');
         
         this.scene.remove(this.player);
-        document.getElementById('final-score').textContent = this.score;
-        document.getElementById('hud').classList.remove('active');
-        document.getElementById('game-over-screen').classList.add('active');
     }
 }
-
