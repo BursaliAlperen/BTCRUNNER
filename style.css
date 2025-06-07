@@ -1,0 +1,243 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+:root {
+    --primary-color: #00ffff; /* Neon Blue */
+    --secondary-color: #ff00ff; /* Neon Purple */
+    --accent-color: #ffa500; /* Orange Accent */
+    --dark-bg: #0a0a1f;
+    --text-color: #f0f0f0;
+    --font-family: 'Orbitron', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--dark-bg);
+    color: var(--text-color);
+    font-family: var(--font-family);
+}
+
+#game-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+    display: block;
+}
+
+#ui-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allow clicks to pass through to canvas */
+}
+
+.menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(10, 10, 31, 0.7);
+    backdrop-filter: blur(5px);
+    transition: opacity 0.5s ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.menu.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+h1 {
+    font-size: 3rem;
+    color: var(--primary-color);
+    text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+h2 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    text-shadow: 0 0 8px var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+button {
+    font-family: var(--font-family);
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 0.8rem 1.8rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 5px var(--primary-color), inset 0 0 5px var(--primary-color);
+    text-shadow: 0 0 3px var(--primary-color);
+}
+
+button:hover {
+    background: var(--primary-color);
+    color: var(--dark-bg);
+    box-shadow: 0 0 15px var(--primary-color), inset 0 0 10px var(--primary-color);
+}
+
+/* HUD Styling */
+#hud {
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    background: transparent;
+    backdrop-filter: none;
+    pointer-events: none; /* HUD itself is not interactive */
+}
+
+#hud.active {
+    pointer-events: all;
+}
+
+
+#score-container {
+    position: absolute;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--accent-color);
+}
+
+.coin-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.5rem;
+}
+
+#score {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    text-shadow: 0 0 5px var(--accent-color);
+}
+
+.bottom-buttons {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ingame-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    pointer-events: all;
+    background: rgba(0,0,0,0.3);
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+    box-shadow: 0 0 5px var(--secondary-color), inset 0 0 5px var(--secondary-color);
+}
+
+/* Admin Panel */
+#admin-panel {
+    gap: 1rem;
+}
+
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 90%;
+    max-width: 400px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid var(--secondary-color);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-bottom: 0.3rem;
+}
+
+.form-group input {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--primary-color);
+    color: var(--text-color);
+    padding: 0.5rem;
+    border-radius: 5px;
+    font-family: var(--font-family);
+}
+
+.admin-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1rem;
+}
+
+#admin-status .pending { color: var(--accent-color); }
+#admin-status .approved { color: #00ff00; }
+#admin-status .denied { color: #ff0000; }
+
+
+#approve-btn { border-color: #00ff00; color: #00ff00; box-shadow: 0 0 5px #00ff00; }
+#reject-btn { border-color: #ff0000; color: #ff0000; box-shadow: 0 0 5px #ff0000; }
+.back-btn { margin-top: 1rem; }
+
+
+/* Game Over */
+#game-over-screen p {
+    font-size: 1.5rem;
+    color: var(--text-color);
+}
+#game-over-screen button {
+    margin-top: 1rem;
+}
+
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+    }
+    h2 {
+        font-size: 1.8rem;
+    }
+    button {
+        padding: 0.7rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+

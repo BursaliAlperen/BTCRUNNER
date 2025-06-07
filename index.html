@@ -1,0 +1,82 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Endless Crypto Runner</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <canvas id="game-canvas"></canvas>
+
+    <div id="ui-container">
+        <!-- Main Menu -->
+        <div id="main-menu" class="menu active">
+            <h1>Endless Crypto Runner</h1>
+            <div class="menu-buttons">
+                <button id="start-btn">▶️ Start</button>
+                <button id="settings-btn">⚙️ Settings</button>
+                <button id="withdraw-btn-menu">💰 Withdraw</button>
+                <button id="admin-btn">🔐 Admin Panel</button>
+            </div>
+        </div>
+
+        <!-- HUD -->
+        <div id="hud" class="menu">
+            <div id="score-container">
+                <img src="coin-icon.png" alt="Coin" class="coin-icon">
+                <span id="score">0</span>
+            </div>
+            <div id="powerups-container">
+                <!-- Power-up icons will go here -->
+            </div>
+            <div class="bottom-buttons">
+                 <button id="admin-btn-ingame" class="ingame-btn">Admin</button>
+                 <button id="withdraw-btn-ingame" class="ingame-btn">Withdraw</button>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="menu">
+            <h2>Admin Panel</h2>
+            <div class="admin-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" value="Player123">
+                </div>
+                <div class="form-group">
+                    <label for="withdraw-amount">Withdraw Amount (satoshi)</label>
+                    <input type="number" id="withdraw-amount" name="withdraw-amount" value="10000">
+                </div>
+                <div class="form-group">
+                    <label for="btc-address">BTC Address</label>
+                    <input type="text" id="btc-address" name="btc-address" value="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa">
+                </div>
+                 <div id="admin-status">Status: <span class="pending">Pending</span></div>
+                <div class="admin-actions">
+                    <button id="approve-btn">✅ Approve</button>
+                    <button id="reject-btn">❌ Reject</button>
+                </div>
+            </div>
+            <button id="admin-back-btn" class="back-btn">Back</button>
+        </div>
+        
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="menu">
+            <h2>Game Over</h2>
+            <p>Your Score: <span id="final-score">0</span></p>
+            <button id="restart-btn">Restart</button>
+        </div>
+
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
