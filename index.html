@@ -20,11 +20,14 @@
         <!-- Main Menu -->
         <div id="main-menu" class="menu active">
             <h1>Endless Crypto Runner</h1>
+            <p class="balance-display">Balance: <span id="main-menu-balance">0</span> sats</p>
             <div class="menu-buttons">
-                <button id="start-btn">▶️ Start</button>
+                <button id="start-btn" class="requires-account">▶️ Start</button>
+                <button id="login-btn" class="not-logged-in">🔑 Login</button>
+                <button id="create-account-btn" class="not-logged-in">Create Account</button>
                 <button id="settings-btn">⚙️ Settings</button>
-                <button id="withdraw-btn-menu">💰 Withdraw</button>
-                <button id="admin-btn">🔐 Admin Panel</button>
+                <button id="withdraw-btn-menu" class="requires-account">💰 Withdraw</button>
+                <button id="admin-btn" class="requires-account">🔐 Admin Panel</button>
             </div>
         </div>
 
@@ -33,6 +36,9 @@
             <div id="score-container">
                 <img src="coin-icon.png" alt="Coin" class="coin-icon">
                 <span id="score">0</span>
+            </div>
+            <div id="balance-container-hud">
+                Balance: <span id="hud-balance">0</span>
             </div>
             <div id="powerups-container">
                 <!-- Power-up icons will go here -->
@@ -46,33 +52,97 @@
         <!-- Admin Panel -->
         <div id="admin-panel" class="menu">
             <h2>Admin Panel</h2>
-            <div class="admin-form">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" value="Player123">
-                </div>
-                <div class="form-group">
-                    <label for="withdraw-amount">Withdraw Amount (satoshi)</label>
-                    <input type="number" id="withdraw-amount" name="withdraw-amount" value="10000">
-                </div>
-                <div class="form-group">
-                    <label for="btc-address">BTC Address</label>
-                    <input type="text" id="btc-address" name="btc-address" value="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa">
-                </div>
-                 <div id="admin-status">Status: <span class="pending">Pending</span></div>
-                <div class="admin-actions">
-                    <button id="approve-btn">✅ Approve</button>
-                    <button id="reject-btn">❌ Reject</button>
+            <div id="admin-request-list-container">
+                <div id="admin-request-list">
+                    <!-- Withdrawal requests will be populated here by JS -->
                 </div>
             </div>
             <button id="admin-back-btn" class="back-btn">Back</button>
         </div>
         
+        <!-- Withdraw Screen -->
+        <div id="withdraw-screen" class="menu">
+            <h2>Withdraw</h2>
+            <div class="balance-display">
+                Available Balance: <span id="withdraw-balance">0</span> satoshi
+            </div>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="withdraw-request-amount">Amount (satoshi)</label>
+                    <input type="number" id="withdraw-request-amount" placeholder="Min 10,000">
+                </div>
+                <div class="form-group">
+                    <label for="withdraw-request-address">BTC Address</label>
+                    <input type="text" id="withdraw-request-address" placeholder="Enter your BTC address">
+                </div>
+                <p id="withdraw-status-message"></p>
+                <button id="request-withdraw-btn">Request Withdrawal</button>
+            </div>
+            <button id="withdraw-back-btn" class="back-btn">Back</button>
+        </div>
+
+        <!-- Settings Screen -->
+        <div id="settings-screen" class="menu">
+            <h2>Settings</h2>
+            <div class="settings-container">
+                <button id="music-toggle-btn" class="setting-option">Music: ON</button>
+                <button id="logout-btn" class="setting-option requires-account">Logout</button>
+            </div>
+            <button id="settings-back-btn" class="back-btn">Back</button>
+        </div>
+
+        <!-- Create Account Screen -->
+        <div id="create-account-screen" class="menu">
+            <h2>Create Account</h2>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="new-username">Username</label>
+                    <input type="text" id="new-username" name="new-username" placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label for="new-email">Email</label>
+                    <input type="email" id="new-email" name="new-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="new-password">Password</label>
+                    <input type="password" id="new-password" name="new-password" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your password">
+                </div>
+                <p id="account-creation-status"></p>
+                <button id="create-account-submit-btn">Create Account</button>
+            </div>
+            <button id="account-back-btn" class="back-btn">Back</button>
+        </div>
+
+        <!-- Login Screen -->
+        <div id="login-screen" class="menu">
+            <h2>Login</h2>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="login-username">Username or Email</label>
+                    <input type="text" id="login-username" name="login-username" placeholder="Enter your username or email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="login-password" placeholder="Enter your password">
+                </div>
+                <p id="login-status-message"></p>
+                <button id="login-submit-btn">Login</button>
+            </div>
+            <button id="login-back-btn" class="back-btn">Back</button>
+        </div>
+
         <!-- Game Over Screen -->
         <div id="game-over-screen" class="menu">
             <h2>Game Over</h2>
             <p>Your Score: <span id="final-score">0</span></p>
-            <button id="restart-btn">Restart</button>
+            <div class="game-over-buttons">
+                <button id="restart-btn">Restart</button>
+                <button id="main-menu-btn">Main Menu</button>
+            </div>
         </div>
 
     </div>
